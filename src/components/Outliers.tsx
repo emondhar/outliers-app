@@ -20,6 +20,9 @@ export default function Outliers() {
     "all" | "week" | "month" | "3months" | "6months" | "year"
   >("all");
 
+  // selected video for modal
+  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
+
   const loadFromPaste = () => {
     try {
       const obj = JSON.parse(rawJson);
@@ -330,10 +333,69 @@ export default function Outliers() {
 
       {/* Cards */}
       <div className="w-full grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        {filtered.map((v: Video) => (
-          <VideoCard key={v.id} video={v} />
+        {filtered.map((video) => (
+          <div
+            key={video.id}
+            role="button"
+            tabIndex={0}
+            onClick={() => setSelectedVideo(video)}
+            onKeyDown={(e) => e.key === "Enter" && setSelectedVideo(video)}
+            className="text-left focus:outline-none cursor-pointer"
+          >
+            <VideoCard video={video} />
+          </div>
         ))}
       </div>
+
+      {/* Modal */}
+      {selectedVideo && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-neutral-800 rounded-lg overflow-hidden w-full max-w-3xl relative">
+            <button
+              onClick={() => setSelectedVideo(null)}
+              className="absolute top-2 right-2 text-white p-1 rounded-full hover:bg-neutral-700"
+              aria-label="Close"
+            >
+              ×
+            </button>
+            <div className="aspect-w-16 aspect-h-9">
+              <iframe
+                title={selectedVideo.title}
+                src={`https://www.youtube.com/embed/${selectedVideo.id}`}
+                allowFullScreen
+                className="w-full h-full"
+              />
+            </div>
+            <div className="p-6 text-white">
+              <h2 className="text-2xl font-bold">{selectedVideo.title}</h2>
+              <p className="text-sm text-neutral-400 mt-1">
+                {Intl.NumberFormat().format(selectedVideo.views)} views •{" "}
+                {selectedVideo.publishedAt}
+              </p>
+              <div className="grid grid-cols-2 gap-4 mt-6">
+                <div className="bg-neutral-700 p-4 rounded">
+                  <p className="font-bold">{selectedVideo.outlierScore}x</p>
+                  <p className="text-xs text-neutral-300">Outlier Score</p>
+                </div>
+                <div className="bg-neutral-700 p-4 rounded">
+                  <p className="font-bold">
+                    {Intl.NumberFormat().format(selectedVideo.views)}
+                  </p>
+                  <p className="text-xs text-neutral-300">Views</p>
+                </div>
+                <div className="bg-neutral-700 p-4 rounded">
+                  <p className="font-bold">{selectedVideo.vph}</p>
+                  <p className="text-xs text-neutral-300">Views Per Hour</p>
+                </div>
+                <div className="bg-neutral-700 p-4 rounded">
+                  <p className="font-bold">{selectedVideo.length}m</p>
+                  <p className="text-xs text-neutral-300">Length</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
