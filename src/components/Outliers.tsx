@@ -143,9 +143,14 @@ export default function Outliers() {
           <div className="bg-slate-600 rounded-lg p-6 max-w-lg text-center">
             <h2 className="text-xl font-bold mb-2">Hi there!</h2>
             <p className="mb-4">
-              This app is made by <strong>Emon Dhar</strong>. Paste your
-              outliers JSON below to see videos, filter them, and click to view
-              details in a modal.
+              This app is made by{" "}
+              <strong>
+                <a href="https://emondhar.com" className="text-blue-400">
+                  Emon Dhar
+                </a>
+              </strong>
+              . Paste your outliers JSON below to see videos, filter them, and
+              click to view details in a modal.
             </p>
             <p className="text-sm font-mono text-left bg-gray-800 p-2 rounded overflow-auto">
               Example JSON:
