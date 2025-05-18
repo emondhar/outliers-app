@@ -54,6 +54,33 @@ export default function Outliers() {
     }
   };
 
+  const loadFromExample = async () => {
+    try {
+      // fetch the raw JSON text and place it into the textarea
+      const text = await fetch("/example.json").then((r) => r.text());
+      setRawJson(text);
+      // optionally clear parsed so the user sees the text before parsing
+      const obj = await fetch("/example.json").then((r) => r.json());
+      const vids: Video[] = obj.data.map((v: any) => ({
+        id: v.video_id,
+        title: v.video_title,
+        thumbnail: v.video_thumbnail,
+        outlierScore: v.breakout_score,
+        vph: v.vph,
+        channelName: v.channel_title,
+        channelSubs: v.subscriber_count,
+        views: v.view_count,
+        publishedAt: new Date(v.video_published_at * 1000).toLocaleDateString(),
+        publishedTimestamp: v.video_published_at * 1000,
+        type: v.video_type === "long" ? "video" : "short",
+        length: Math.ceil(v.video_duration / 60),
+      }));
+      setParsed(vids);
+    } catch {
+      alert("Failed to load example JSON.");
+    }
+  };
+
   // choose data source
   const allVideos = parsed.length ? parsed : sampleVideos;
 
@@ -175,16 +202,22 @@ export default function Outliers() {
             className="w-full h-32 p-2 bg-neutral-800 text-sm text-white rounded"
             placeholder="Paste your outliers JSON here…"
             value={rawJson}
-            onChange={(e: { target: { value: any } }) =>
-              setRawJson(e.target.value)
-            }
+            onChange={(e) => setRawJson(e.target.value)}
           />
-          <button
-            className="mt-2 px-4 py-2 bg-rose-600 rounded font-bold"
-            onClick={loadFromPaste}
-          >
-            Load Data
-          </button>
+          <div className="flex gap-2 mt-2">
+            <button
+              className="px-4 py-2 bg-rose-600 rounded font-bold"
+              onClick={loadFromPaste}
+            >
+              Load Data
+            </button>
+            <button
+              className="px-4 py-2 bg-blue-600 rounded font-bold"
+              onClick={loadFromExample}
+            >
+              Load Sample
+            </button>
+          </div>
         </div>
 
         {/* Header & toggles */}
@@ -397,7 +430,7 @@ export default function Outliers() {
                 className="absolute top-2 right-2 text-white p-1 rounded-full hover:bg-neutral-700"
                 aria-label="Close"
               >
-                ×
+                CLOSE
               </button>
               <div className="aspect-w-16 aspect-h-9">
                 <iframe
